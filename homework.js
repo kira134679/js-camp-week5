@@ -6,43 +6,88 @@
 
 // 產品資料
 const products = [
-  { id: 'prod-1', title: '經典白T', category: '衣服', origin_price: 500, price: 399, images: 'https://example.com/t1.jpg' },
-  { id: 'prod-2', title: '牛仔褲', category: '褲子', origin_price: 1200, price: 899, images: 'https://example.com/p1.jpg' },
-  { id: 'prod-3', title: '帆布鞋', category: '鞋子', origin_price: 1800, price: 1299, images: 'https://example.com/s1.jpg' },
-  { id: 'prod-4', title: '棒球帽', category: '配件', origin_price: 350, price: 299, images: 'https://example.com/h1.jpg' },
-  { id: 'prod-5', title: '運動外套', category: '衣服', origin_price: 2000, price: 1599, images: 'https://example.com/j1.jpg' }
+  {
+    id: "prod-1",
+    title: "經典白T",
+    category: "衣服",
+    origin_price: 500,
+    price: 399,
+    images: "https://example.com/t1.jpg",
+  },
+  {
+    id: "prod-2",
+    title: "牛仔褲",
+    category: "褲子",
+    origin_price: 1200,
+    price: 899,
+    images: "https://example.com/p1.jpg",
+  },
+  {
+    id: "prod-3",
+    title: "帆布鞋",
+    category: "鞋子",
+    origin_price: 1800,
+    price: 1299,
+    images: "https://example.com/s1.jpg",
+  },
+  {
+    id: "prod-4",
+    title: "棒球帽",
+    category: "配件",
+    origin_price: 350,
+    price: 299,
+    images: "https://example.com/h1.jpg",
+  },
+  {
+    id: "prod-5",
+    title: "運動外套",
+    category: "衣服",
+    origin_price: 2000,
+    price: 1599,
+    images: "https://example.com/j1.jpg",
+  },
 ];
 
 // 購物車資料
 const carts = [
-  { id: 'cart-1', product: products[0], quantity: 2 },
-  { id: 'cart-2', product: products[2], quantity: 1 },
-  { id: 'cart-3', product: products[4], quantity: 1 }
+  { id: "cart-1", product: products[0], quantity: 2 },
+  { id: "cart-2", product: products[2], quantity: 1 },
+  { id: "cart-3", product: products[4], quantity: 1 },
 ];
 
 // 訂單資料
 const orders = [
   {
-    id: 'order-1',
+    id: "order-1",
     createdAt: 1704067200, // Unix timestamp
     paid: false,
     total: 2097,
-    user: { name: '王小明', tel: '0912345678', email: 'ming@example.com', address: '台北市信義區', payment: 'ATM' },
+    user: {
+      name: "王小明",
+      tel: "0912345678",
+      email: "ming@example.com",
+      address: "台北市信義區",
+      payment: "ATM",
+    },
     products: [
       { ...products[0], quantity: 2 },
-      { ...products[2], quantity: 1 }
-    ]
+      { ...products[2], quantity: 1 },
+    ],
   },
   {
-    id: 'order-2',
+    id: "order-2",
     createdAt: 1704153600,
     paid: true,
     total: 899,
-    user: { name: '李小華', tel: '0923456789', email: 'hua@example.com', address: '台中市西區', payment: 'Credit Card' },
-    products: [
-      { ...products[1], quantity: 1 }
-    ]
-  }
+    user: {
+      name: "李小華",
+      tel: "0923456789",
+      email: "hua@example.com",
+      address: "台中市西區",
+      payment: "Credit Card",
+    },
+    products: [{ ...products[1], quantity: 1 }],
+  },
 ];
 
 // ========================================
@@ -56,7 +101,9 @@ const orders = [
  * @returns {Object|null} - 回傳產品物件，找不到回傳 null
  */
 function getProductById(products, productId) {
-  // 請實作此函式
+  if (products.length === 0) return null;
+  const product = products.find(({ id }) => id === productId);
+  return product === undefined ? null : product;
 }
 
 /**
@@ -66,7 +113,8 @@ function getProductById(products, productId) {
  * @returns {Array} - 回傳符合分類的產品陣列，若 category 為 '全部' 則回傳全部產品
  */
 function getProductsByCategory(products, category) {
-  // 請實作此函式
+  if (category === "全部") return products;
+  return products.filter((product) => product.category === category);
 }
 
 /**
@@ -76,7 +124,7 @@ function getProductsByCategory(products, category) {
  * 計算方式：Math.round((price / origin_price) * 100) / 10
  */
 function getDiscountRate(product) {
-  // 請實作此函式
+  return `${Math.round((product.price / product.origin_price) * 100) / 10}折`;
 }
 
 /**
@@ -85,7 +133,9 @@ function getDiscountRate(product) {
  * @returns {Array} - 回傳分類陣列，例如 ['衣服', '褲子', '鞋子', '配件']
  */
 function getAllCategories(products) {
-  // 請實作此函式
+  const categorySet = new Set();
+  products.forEach((product) => categorySet.add(product.category));
+  return [...categorySet];
 }
 
 // ========================================
@@ -98,7 +148,9 @@ function getAllCategories(products) {
  * @returns {number} - 回傳數字（原價 × 數量 的總和）
  */
 function calculateCartOriginalTotal(carts) {
-  // 請實作此函式
+  return carts
+    .map((cartItem) => cartItem.product.origin_price * cartItem.quantity)
+    .reduce((acc, current) => acc + current, 0);
 }
 
 /**
@@ -107,7 +159,9 @@ function calculateCartOriginalTotal(carts) {
  * @returns {number} - 回傳數字（售價 × 數量 的總和）
  */
 function calculateCartTotal(carts) {
-  // 請實作此函式
+  return carts
+    .map((cartItem) => cartItem.product.price * cartItem.quantity)
+    .reduce((acc, current) => acc + current, 0);
 }
 
 /**
@@ -116,7 +170,7 @@ function calculateCartTotal(carts) {
  * @returns {number} - 回傳原價總金額 - 售價總金額
  */
 function calculateSavings(carts) {
-  // 請實作此函式
+  return calculateCartOriginalTotal(carts) - calculateCartTotal(carts);
 }
 
 /**
@@ -125,7 +179,9 @@ function calculateSavings(carts) {
  * @returns {number} - 回傳所有商品的 quantity 總和
  */
 function calculateCartItemCount(carts) {
-  // 請實作此函式
+  return carts
+    .map((cartItem) => cartItem.quantity)
+    .reduce((acc, current) => acc + current, 0);
 }
 
 /**
@@ -135,7 +191,9 @@ function calculateCartItemCount(carts) {
  * @returns {boolean} - 回傳 true 或 false
  */
 function isProductInCart(carts, productId) {
-  // 請實作此函式
+  if (carts.length === 0) return false;
+  const foundItem = carts.find((cartItem) => cartItem.product.id === productId);
+  return foundItem === undefined ? false : true;
 }
 
 // ========================================
@@ -151,7 +209,16 @@ function isProductInCart(carts, productId) {
  * 如果產品已存在，合併數量；如果不存在，新增一筆
  */
 function addToCart(carts, product, quantity) {
-  // 請實作此函式
+  if (isProductInCart(carts, product.id)) {
+    carts.map((cartItem) => {
+      if (cartItem.product.id === product.id) {
+        const newQuantity = cartItem.product.quantity + quantity;
+        return { ...cartItem.product, newQuantity };
+      }
+    });
+  } else {
+    return [...carts, product];
+  }
 }
 
 /**
@@ -162,7 +229,12 @@ function addToCart(carts, product, quantity) {
  * @returns {Array} - 回傳新的購物車陣列，如果 newQuantity <= 0，移除該商品
  */
 function updateCartItemQuantity(carts, cartId, newQuantity) {
-  // 請實作此函式
+  if (newQuantity <= 0) {
+    return removeFromCart(carts, cartId);
+  } else {
+    const targetCartItem = carts.find((cartItem) => cartItem.id === cartId);
+    return [...carts, { ...targetCartItem, quantity: newQuantity }];
+  }
 }
 
 /**
@@ -172,7 +244,7 @@ function updateCartItemQuantity(carts, cartId, newQuantity) {
  * @returns {Array} - 回傳移除後的新購物車陣列
  */
 function removeFromCart(carts, cartId) {
-  // 請實作此函式
+  return carts.filter((cartItem) => cartItem.id !== cartId);
 }
 
 /**
@@ -180,7 +252,7 @@ function removeFromCart(carts, cartId) {
  * @returns {Array} - 回傳空陣列
  */
 function clearCart() {
-  // 請實作此函式
+  return [];
 }
 
 // ========================================
@@ -193,7 +265,10 @@ function clearCart() {
  * @returns {number} - 只計算已付款 (paid: true) 的訂單
  */
 function calculateTotalRevenue(orders) {
-  // 請實作此函式
+  const ordersIsPaid = filterOrdersByStatus(orders, true);
+  return ordersIsPaid
+    .map((order) => order.total)
+    .reduce((totalRevenue, current) => totalRevenue + current, 0);
 }
 
 /**
@@ -203,7 +278,7 @@ function calculateTotalRevenue(orders) {
  * @returns {Array} - 回傳篩選後的訂單陣列
  */
 function filterOrdersByStatus(orders, isPaid) {
-  // 請實作此函式
+  return orders.filter((order) => order.paid === isPaid);
 }
 
 /**
@@ -219,7 +294,17 @@ function filterOrdersByStatus(orders, isPaid) {
  * }
  */
 function generateOrderReport(orders) {
-  // 請實作此函式
+  const orderReport = {};
+  orderReport.totalOrders = orders.length;
+  orderReport.paidOrders = filterOrdersByStatus(orders, true).length;
+  orderReport.unpaidOrders = filterOrdersByStatus(orders, false).length;
+  orderReport.totalRevenue = calculateTotalRevenue(orders);
+  orderReport.averageOrderValue =
+    orderReport.totalOrders === 0
+      ? 0
+      : orderReport.totalRevenue / orderReport.totalOrders;
+
+  return orderReport;
 }
 
 /**
@@ -232,7 +317,16 @@ function generateOrderReport(orders) {
  * }
  */
 function groupOrdersByPayment(orders) {
-  // 請實作此函式
+  const groupOrders = {};
+  orders.forEach((order) => {
+    if (groupOrders[order.user.payment] === undefined) {
+      groupOrders[order.user.payment] = [order];
+    } else {
+      groupOrders[order.user.payment].push(order);
+    }
+  });
+
+  return groupOrders;
 }
 
 // ========================================
@@ -240,33 +334,36 @@ function groupOrdersByPayment(orders) {
 // ========================================
 
 // 任務一測試
-console.log('=== 任務一測試 ===');
-console.log('getProductById:', getProductById(products, 'prod-1'));
-console.log('getProductsByCategory:', getProductsByCategory(products, '衣服'));
-console.log('getDiscountRate:', getDiscountRate(products[0]));
-console.log('getAllCategories:', getAllCategories(products));
+console.log("=== 任務一測試 ===");
+console.log("getProductById:", getProductById(products, "prod-1"));
+console.log("getProductsByCategory:", getProductsByCategory(products, "衣服"));
+console.log("getDiscountRate:", getDiscountRate(products[0]));
+console.log("getAllCategories:", getAllCategories(products));
 
 // 任務二測試
-console.log('\n=== 任務二測試 ===');
-console.log('calculateCartOriginalTotal:', calculateCartOriginalTotal(carts));
-console.log('calculateCartTotal:', calculateCartTotal(carts));
-console.log('calculateSavings:', calculateSavings(carts));
-console.log('calculateCartItemCount:', calculateCartItemCount(carts));
-console.log('isProductInCart:', isProductInCart(carts, 'prod-1'));
+console.log("\n=== 任務二測試 ===");
+console.log("calculateCartOriginalTotal:", calculateCartOriginalTotal(carts));
+console.log("calculateCartTotal:", calculateCartTotal(carts));
+console.log("calculateSavings:", calculateSavings(carts));
+console.log("calculateCartItemCount:", calculateCartItemCount(carts));
+console.log("isProductInCart:", isProductInCart(carts, "prod-1"));
 
 // 任務三測試
-console.log('\n=== 任務三測試 ===');
-console.log('addToCart:', addToCart(carts, products[1], 2));
-console.log('updateCartItemQuantity:', updateCartItemQuantity(carts, 'cart-1', 5));
-console.log('removeFromCart:', removeFromCart(carts, 'cart-1'));
-console.log('clearCart:', clearCart());
+console.log("\n=== 任務三測試 ===");
+console.log("addToCart:", addToCart(carts, products[1], 2));
+console.log(
+  "updateCartItemQuantity:",
+  updateCartItemQuantity(carts, "cart-1", 5),
+);
+console.log("removeFromCart:", removeFromCart(carts, "cart-1"));
+console.log("clearCart:", clearCart());
 
 // 任務四測試
-console.log('\n=== 任務四測試 ===');
-console.log('calculateTotalRevenue:', calculateTotalRevenue(orders));
-console.log('filterOrdersByStatus:', filterOrdersByStatus(orders, true));
-console.log('generateOrderReport:', generateOrderReport(orders));
-console.log('groupOrdersByPayment:', groupOrdersByPayment(orders));
+console.log("\n=== 任務四測試 ===");
+console.log("calculateTotalRevenue:", calculateTotalRevenue(orders));
+console.log("filterOrdersByStatus:", filterOrdersByStatus(orders, true));
+console.log("generateOrderReport:", generateOrderReport(orders));
+console.log("groupOrdersByPayment:", groupOrdersByPayment(orders));
 
 // ========================================
 // 匯出函式供測試使用
@@ -288,5 +385,5 @@ module.exports = {
   calculateTotalRevenue,
   filterOrdersByStatus,
   generateOrderReport,
-  groupOrdersByPayment
+  groupOrdersByPayment,
 };
