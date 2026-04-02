@@ -192,8 +192,7 @@ function calculateCartItemCount(carts) {
  */
 function isProductInCart(carts, productId) {
   if (carts.length === 0) return false;
-  const foundItem = carts.find((cartItem) => cartItem.product.id === productId);
-  return foundItem === undefined ? false : true;
+  return carts.some((cartItem) => cartItem.product.id === productId);
 }
 
 // ========================================
@@ -210,14 +209,20 @@ function isProductInCart(carts, productId) {
  */
 function addToCart(carts, product, quantity) {
   if (isProductInCart(carts, product.id)) {
-    carts.map((cartItem) => {
+    return carts.map((cartItem) => {
       if (cartItem.product.id === product.id) {
-        const newQuantity = cartItem.product.quantity + quantity;
-        return { ...cartItem.product, newQuantity };
+        const newQuantity = cartItem.quantity + quantity;
+        return { ...cartItem, quantity: newQuantity };
       }
+      return cartItem;
     });
   } else {
-    return [...carts, product];
+    const newCartItem = {
+      id: `cart-${carts.length + 1}`,
+      product: product,
+      quantity: quantity,
+    };
+    return [...carts, newCartItem];
   }
 }
 
@@ -232,8 +237,12 @@ function updateCartItemQuantity(carts, cartId, newQuantity) {
   if (newQuantity <= 0) {
     return removeFromCart(carts, cartId);
   } else {
-    const targetCartItem = carts.find((cartItem) => cartItem.id === cartId);
-    return [...carts, { ...targetCartItem, quantity: newQuantity }];
+    return carts.map((cartItem) => {
+      if (cartItem.id === cartId) {
+        return { ...cartItem, quantity: newQuantity };
+      }
+      return cartItem;
+    });
   }
 }
 
@@ -296,13 +305,23 @@ function filterOrdersByStatus(orders, isPaid) {
 function generateOrderReport(orders) {
   const orderReport = {};
   orderReport.totalOrders = orders.length;
-  orderReport.paidOrders = filterOrdersByStatus(orders, true).length;
-  orderReport.unpaidOrders = filterOrdersByStatus(orders, false).length;
+
+  const paidOrders = filterOrdersByStatus(orders, true);
+  const unpaidOrders = filterOrdersByStatus(orders, false);
+
+  orderReport.paidOrders = paidOrders.length;
+  orderReport.unpaidOrders = unpaidOrders.length;
   orderReport.totalRevenue = calculateTotalRevenue(orders);
+
+  const averageOrderValue = paidOrders
+    .concat(unpaidOrders)
+    .map((order) => order.total)
+    .reduce((acc, current) => acc + current, 0);
+
   orderReport.averageOrderValue =
     orderReport.totalOrders === 0
       ? 0
-      : orderReport.totalRevenue / orderReport.totalOrders;
+      : averageOrderValue / orderReport.totalOrders;
 
   return orderReport;
 }
@@ -317,16 +336,11 @@ function generateOrderReport(orders) {
  * }
  */
 function groupOrdersByPayment(orders) {
-  const groupOrders = {};
-  orders.forEach((order) => {
-    if (groupOrders[order.user.payment] === undefined) {
-      groupOrders[order.user.payment] = [order];
-    } else {
-      groupOrders[order.user.payment].push(order);
-    }
-  });
-
-  return groupOrders;
+  return orders.reduce((acc, order) => {
+    const method = order.user.payment;
+    (acc[method] ??= []).push(order);
+    return acc;
+  }, {});
 }
 
 // ========================================
